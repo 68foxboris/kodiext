@@ -24,7 +24,7 @@ from Tools.Directories import fileExists
 from Tools import Notifications
 
 from Components.config import config
-from Components.AVSwitch import iAVSwitch
+from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
 from .e2utils import InfoBarAspectChange, WebPixmap, MyAudioSelection, \
     StatusScreen, getPlayPositionInSeconds, getDurationInSeconds, \
@@ -34,8 +34,8 @@ from enigma import eServiceReference, eTimer, ePythonMessagePump, \
 from Components.SystemInfo import SystemInfo
 from .server import KodiExtRequestHandler, UDSServer
 from Tools.BoundFunction import boundFunction
-from boxbranding import getMachineBrand
 from Tools.Directories import isPluginInstalled
+from Tools.HardwareInfo import HardwareInfo
 
 from six.moves.queue import Queue
 
@@ -160,7 +160,7 @@ class SetResolution:
         self.kodirate = "50Hz"
         self.port = config.av.videoport.value
         self.rate = None
-        if getMachineBrand() in ('Vu+', 'Formuler'):
+        if HardwareInfo().get_device_name() in ('Vu+', 'Formuler'):
             resolutions = ("720i", "720p")
         else:
             resolutions = ("720i", "720p", "1080i", "1080p")
@@ -168,7 +168,7 @@ class SetResolution:
             for res in resolutions:
                 for rate in rates:
                     try:
-                        if iAVSwitch.isModeAvailable(self.port, res, rate):
+                        if video_hw.isModeAvailable(self.port, res, rate):
                             self.kodires = res
                             self.kodirate = rate
                     except:
@@ -177,11 +177,11 @@ class SetResolution:
     def switch(self,Tokodi=False, Player=False):
         if Tokodi:
             if self.kodires and self.kodirate and self.port:
-                iAVSwitch.setMode(self.port, self.kodires, self.kodirate)
+                video_hw.setMode(self.port, self.kodires, self.kodirate)
                 open("/proc/stb/video/videomode", "w").write(self.kodires+self.kodirate.replace("Hz", ""))
         else:
             if self.E2res and self.rate and self.port:
-                iAVSwitch.setMode(self.port, self.E2res, self.rate)
+                video_hw.setMode(self.port, self.E2res, self.rate)
 
     def ReadData(self):
         self.E2res = config.av.videomode[self.port].value
@@ -790,7 +790,7 @@ class E2KodiExtServer(UDSServer):
         FBUnlock(); RCUnlock()
 
         setaudio.switch(False, True)
-        if getMachineBrand() not in ('Vu+', 'Formuler'):
+        if HardwareInfo().get_device_name() not in ('Vu+', 'Formuler'):
             setresolution.switch(False, True)
         # parse subtitles, play path and service type from data
         sType = 4097
@@ -857,7 +857,7 @@ class E2KodiExtServer(UDSServer):
 
     def kodiPlayerExitCB(self, callback=None):
         setaudio.switch(True, True)
-        if getMachineBrand() not in ('Vu+', 'Formuler'):
+        if HardwareInfo().get_device_name() not in ('Vu+', 'Formuler'):
             setresolution.switch(True, True)
         SESSION.nav.stopService()
         self.kodiPlayer = None
