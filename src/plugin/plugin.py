@@ -542,7 +542,7 @@ class Meta(object):
         self.meta = meta
 
     def getTitle(self):
-        title = u""
+        title = ""
         vTag = self.meta.get('videoInfoTag')
         if vTag:
             if vTag.get('showtitle'):
@@ -558,15 +558,15 @@ class Meta(object):
                 except:
                     season = -1
                 if season > 0 and episode > 0:
-                    title += u" S%02dE%02d"%(season, episode)
+                    title += " S%02dE%02d"%(season, episode)
                 episodeTitle = vTag.get("title")
                 if episodeTitle:
-                    title += u" - " + episodeTitle
+                    title += " - " + episodeTitle
             else:
                 title = vTag.get("title") or vTag.get("originaltitle")
                 year = vTag.get("year")
                 if year and title:
-                    title+= u" (" + str(year) + u")"
+                    title+= " (" + str(year) + ")"
         if not title:
             title = self.meta.get("title")
         filename = self.getFilename()
@@ -577,7 +577,7 @@ class Meta(object):
                 idx=line.find("->")
                 if idx != -1:
                     if tok==0:
-                        title=u''+line[idx+3:]
+                        title=''+line[idx+3:]
                         break
             f.close()
         if not title:
