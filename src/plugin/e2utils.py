@@ -157,9 +157,9 @@ class BufferIndicatorDetailed(Screen):
         widgetWidth = screenWidth / 3 - 5
         self.skin = """
             <screen position="%d,0" size="%d,60" zPosition="2" backgroundColor="transparent" flags="wfNoBorder">
-                <widget source="bufferSize" render="Label" position="0,0" size="%d,70" valign="center" halign="left" font="Regular;22" transparent="1" foregroundColor="#ffffff" shadowColor="#40101010" shadowOffset="2,2" />
-                <widget source="bufferLevel" render="Label" position="%d,0" size="%d,70" valign="center" halign="center" font="Regular;22" transparent="1" foregroundColor="#ffffff" shadowColor="#40101010" shadowOffset="2,2" />
-                <widget source="avgInRate" render="Label" position="%d,0" size="%d,70" valign="center" halign="right" font="Regular;22" transparent="1" foregroundColor="#ffffff" shadowColor="#40101010" shadowOffset="2,2" />
+                <widget source="bufferSize" render="Label" position="0,0" size="%d,70" verticalAlignment="center" horizontalAlignment="left" font="Regular;22" transparent="1" foregroundColor="#ffffff" shadowColor="#40101010" shadowOffset="2,2" />
+                <widget source="bufferLevel" render="Label" position="%d,0" size="%d,70" verticalAlignment="center" horizontalAlignment="center" font="Regular;22" transparent="1" foregroundColor="#ffffff" shadowColor="#40101010" shadowOffset="2,2" />
+                <widget source="avgInRate" render="Label" position="%d,0" size="%d,70" verticalAlignment="center" horizontalAlignment="right" font="Regular;22" transparent="1" foregroundColor="#ffffff" shadowColor="#40101010" shadowOffset="2,2" />
             </screen>""" % (offset, screenWidth, widgetWidth, widgetWidth + 5, widgetWidth, 2 * widgetWidth + 10, widgetWidth)
         Screen.__init__(self, session)
         self["avgInRate"] = StaticText()
@@ -328,7 +328,7 @@ class StatusScreen(Screen):
         statusPositionY = 100
         self.skin = """
             <screen name="StatusScreen" position="%s,%s" size="%s,90" zPosition="0" backgroundColor="transparent" flags="wfNoBorder">
-                    <widget name="status" position="0,0" size="%s,70" valign="center" halign="left" font="Regular;22" transparent="1" shadowColor="#40101010" shadowOffset="3,3" />
+                    <widget name="status" position="0,0" size="%s,70" verticalAlignment="center" horizontalAlignment="left" font="Regular;22" transparent="1" shadowColor="#40101010" shadowOffset="3,3" />
             </screen>""" % (str(statusPositionX), str(statusPositionY), str(desktopSize.width()), str(desktopSize.height()))
         self["status"] = Label()
         self.onClose.append(self.delayTimer.stop)
