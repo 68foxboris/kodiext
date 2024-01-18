@@ -24,7 +24,7 @@ from Tools.Directories import fileExists, isPluginInstalled
 from Tools import Notifications
 
 from Components.config import config
-from Plugins.SystemPlugins.Videomode.VideoHardware import VIDEO
+from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
 from .e2utils import InfoBarAspectChange, WebPixmap, MyAudioSelection, \
     StatusScreen, getPlayPositionInSeconds, getDurationInSeconds, \
