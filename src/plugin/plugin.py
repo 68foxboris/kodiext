@@ -24,7 +24,7 @@ from Tools.Directories import fileExists, isPluginInstalled
 from Tools import Notifications
 
 from Components.config import config
-from Components.AVSwitch import iAVSwitch
+from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 
 from .e2utils import InfoBarAspectChange, WebPixmap, MyAudioSelection, \
     StatusScreen, getPlayPositionInSeconds, getDurationInSeconds, \
@@ -161,7 +161,7 @@ class SetResolution:
         self.kodirate = "50Hz"
         self.port = config.av.videoport.value
         self.rate = None
-        if BRAND in ("vuplus", "formuler"):
+        if BRAND in ("Vu+", "Formuler"):
             resolutions = ("720i", "720p")
         else:
             resolutions = ("720i", "720p", "1080i", "1080p")
@@ -169,7 +169,7 @@ class SetResolution:
             for res in resolutions:
                 for rate in rates:
                     try:
-                        if iAVSwitch.isModeAvailable(self.port, res, rate):
+                        if video_hw.isModeAvailable(self.port, res, rate):
                             self.kodires = res
                             self.kodirate = rate
                     except:
@@ -178,11 +178,11 @@ class SetResolution:
     def switch(self, Tokodi=False, Player=False):
         if Tokodi:
             if self.kodires and self.kodirate and self.port:
-                iAVSwitch.setMode(self.port, self.kodires, self.kodirate)
+                video_hw.setMode(self.port, self.kodires, self.kodirate)
                 open("/proc/stb/video/videomode", "w").write(self.kodires + self.kodirate.replace("Hz", ""))
         else:
             if self.E2res and self.rate and self.port:
-                iAVSwitch.setMode(self.port, self.E2res, self.rate)
+                video_hw.setMode(self.port, self.E2res, self.rate)
 
     def ReadData(self):
         self.E2res = config.av.videomode[self.port].value
@@ -203,8 +203,8 @@ def SaveDesktopInfo():
         _g_dw, _g_dh = 1280, 720
     print("[XBMC] Desktop size [%dx%d]" % (_g_dw, _g_dh))
     if not fileExists('/tmp/dw.info'):
-        Console().ePopen('touch /tmp/dw.info')
-    Console().ePopen('chmod 0o755 /tmp/dw.info')
+        Console().ePopen("touch /tmp/dw.info")
+    Console().ePopen("chmod 0o755 /tmp/dw.info")
     open("/tmp/dw.info", "w").write(str(_g_dw) + "x" + str(_g_dh))
 
 
@@ -808,7 +808,7 @@ class E2KodiExtServer(UDSServer):
         RCUnlock()
 
         setaudio.switch(False, True)
-        if BRAND not in ("Vu+", "formuler"):
+        if BRAND not in ("Vu+", "Formuler"):
             setresolution.switch(False, True)
         # parse subtitles, play path and service type from data
         sType = 4097
