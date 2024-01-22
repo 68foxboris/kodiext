@@ -24,20 +24,20 @@ from Tools.Directories import fileExists, isPluginInstalled
 from Tools import Notifications
 
 from Components.config import config
-from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
+from Components.AVSwitch import iAVSwitch
 
 from .e2utils import InfoBarAspectChange, WebPixmap, MyAudioSelection, \
     StatusScreen, getPlayPositionInSeconds, getDurationInSeconds, \
     InfoBarSubservicesSupport
 from enigma import eServiceReference, eTimer, ePythonMessagePump, \
     iPlayableService, fbClass, eRCInput, getDesktop, eDVBVolumecontrol
-from Components.SystemInfo import BoxInfo, SystemInfo
+from Components.SystemInfo import BoxInfo
 from .server import KodiExtRequestHandler, UDSServer
 from Tools.BoundFunction import boundFunction
 
 from six.moves.queue import Queue
 
-brand = BoxInfo.getItem("brand")
+BRAND = BoxInfo.getItem("brand")
 
 try:
     from Plugins.Extensions.SubsSupport import SubsSupport, SubsSupportStatus
@@ -81,46 +81,46 @@ class SetAudio:
         self.aac = "passthrough"
         self.aacplus = "passthrough"
 
-    def switch(self,Tokodi=False, Player=False):
+    def switch(self, Tokodi=False, Player=False):
         if Tokodi:
             if Player:
                 self.VolPlayer = self.volctrl.getVolume()
-            vol =100
-            ac3="downmix"
-            dts="downmix"
-            aac="passthrough"
-            aacplus="passthrough"
+            vol = 100
+            ac3 = "downmix"
+            dts = "downmix"
+            aac = "passthrough"
+            aacplus = "passthrough"
         else:
             if Player:
                 vol = self.VolPlayer
             else:
                 vol = self.VolPrev
-            ac3=self.ac3
-            dts=self.dts
-            aac=self.aac
-            aacplus=self.aacplus
+            ac3 = self.ac3
+            dts = self.dts
+            aac = self.aac
+            aacplus = self.aacplus
 
         self.volctrl.setVolume(vol, vol)
 
-        if SystemInfo["CanDownmixAC3"]:
+        if BoxInfo.getItem("CanDownmixAC3"):
             try:
                 open("/proc/stb/audio/ac3", "w").write(ac3)
             except:
                 pass
 
-        if SystemInfo["CanDownmixDTS"]:
+        if BoxInfo.getItem("CanDownmixDTS"):
             try:
                 open("/proc/stb/audio/dts", "w").write(dts)
             except:
                 pass
 
-        if SystemInfo["CanDownmixAAC"]:
+        if BoxInfo.getItem("CanDownmixAAC"):
             try:
                 open("/proc/stb/audio/aac", "w").write(aac)
             except:
                 pass
 
-        if SystemInfo["CanDownmixAACPlus"]:
+        if BoxInfo.getItem("CanDownmixAACPlus"):
             try:
                 open("/proc/stb/audio/aacplus", "w").write(aacplus)
             except:
@@ -129,25 +129,25 @@ class SetAudio:
     def ReadData(self):
         self.VolPrev = self.volctrl.getVolume()
         self.VolPlayer = self.VolPrev
-        if SystemInfo["CanDownmixAC3"]:
+        if BoxInfo.getItem("CanDownmixAC3"):
             try:
                 self.ac3 = open("/proc/stb/audio/ac3", "r").read()
             except:
                 pass
 
-        if SystemInfo["CanDownmixDTS"]:
+        if BoxInfo.getItem("CanDownmixDTS"):
             try:
                 self.dts = open("/proc/stb/audio/dts", "r").read()
             except:
                 pass
 
-        if SystemInfo["CanDownmixAAC"]:
+        if BoxInfo.getItem("CanDownmixAAC"):
             try:
                 self.aac = open("/proc/stb/audio/aac", "r").read()
             except:
                 pass
 
-        if SystemInfo["CanDownmixAACPlus"]:
+        if BoxInfo.getItem("CanDownmixAACPlus"):
             try:
                 self.aacplus = open("/proc/stb/audio/aacplus", "r").read()
             except:
@@ -161,7 +161,7 @@ class SetResolution:
         self.kodirate = "50Hz"
         self.port = config.av.videoport.value
         self.rate = None
-        if brand in ('vuplus', 'formuler'):
+        if BRAND in ("vuplus", "formuler"):
             resolutions = ("720i", "720p")
         else:
             resolutions = ("720i", "720p", "1080i", "1080p")
@@ -169,28 +169,30 @@ class SetResolution:
             for res in resolutions:
                 for rate in rates:
                     try:
-                        if VIDEO.isModeAvailable(self.port, res, rate):
+                        if iAVSwitch.isModeAvailable(self.port, res, rate):
                             self.kodires = res
                             self.kodirate = rate
                     except:
                         pass
 
-    def switch(self,Tokodi=False, Player=False):
+    def switch(self, Tokodi=False, Player=False):
         if Tokodi:
             if self.kodires and self.kodirate and self.port:
-                VIDEO.setMode(self.port, self.kodires, self.kodirate)
-                open("/proc/stb/video/videomode", "w").write(self.kodires+self.kodirate.replace("Hz", ""))
+                iAVSwitch.setMode(self.port, self.kodires, self.kodirate)
+                open("/proc/stb/video/videomode", "w").write(self.kodires + self.kodirate.replace("Hz", ""))
         else:
             if self.E2res and self.rate and self.port:
-                VIDEO.setMode(self.port, self.E2res, self.rate)
+                iAVSwitch.setMode(self.port, self.E2res, self.rate)
 
     def ReadData(self):
         self.E2res = config.av.videomode[self.port].value
         self.rate = config.av.videorate[self.E2res].value
         self.switch(True)
 
+
 setaudio = SetAudio()
 setresolution = SetResolution()
+
 
 def SaveDesktopInfo():
     global _g_dw, _g_dh
@@ -205,13 +207,16 @@ def SaveDesktopInfo():
     Console().ePopen('chmod 0o755 /tmp/dw.info')
     open("/tmp/dw.info", "w").write(str(_g_dw) + "x" + str(_g_dh))
 
+
 SaveDesktopInfo()
+
 
 def esHD():
     if getDesktop(0).size().width() > 1400:
         return True
     else:
         return False
+
 
 def fhd(num, factor=1.5):
     if esHD():
@@ -220,24 +225,30 @@ def fhd(num, factor=1.5):
         prod = num
     return int(round(prod))
 
+
 def FBLock():
     print("[KodiLauncher] FBLock")
     fbClass.getInstance().lock()
+
 
 def FBUnlock():
     print("[KodiLauncher] FBUnlock")
     fbClass.getInstance().unlock()
 
+
 def RCLock():
     print("[KodiLauncher] RCLock")
     eRCInput.getInstance().lock()
+
 
 def RCUnlock():
     print("[KodiLauncher] RCUnlock")
     eRCInput.getInstance().unlock()
 
+
 def kodiStopped(data, retval, extraArgs):
     print('[KodiLauncher] kodi stopped: retval = %d' % retval)
+
 
 def kodiResumeStopped(data, retval, extraArgs):
     print('[KodiLauncher] kodi resume script stopped: retval = %d' % retval)
@@ -423,11 +434,11 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
         title = Meta(meta).getTitle()
         if title:
             try:
-                title = re.sub(r"\[.*?\]","",str(title), flags=re.DOTALL)
+                title = re.sub(r"\[.*?\]", "", str(title), flags=re.DOTALL)
             except:
                 pass
- 
-        
+
+
         self.title_ref = title
 
         # set start position if provided
@@ -447,7 +458,7 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
         self["ColorActions"] = HelpableActionMap(self, "ColorActions",
         {
             "blue": self.subtitleSelection,
-#            "yellow": self.audioSelection
+            # "yellow": self.audioSelection
         })
 
         self["actions"] = HelpableActionMap(self, "KodiPlayerActions",
@@ -496,12 +507,13 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
                 InfoBarSeek.seekBackManual(self)
         except:
             InfoBarSeek.seekBackManual(self)
+
     def __evStart(self):
         if self.__position and self.__firstStart:
             self.__firstStart = False
             Notifications.AddNotificationWithID(self.RESUME_POPUP_ID,
-                    MessageBox, _("Resuming playback"), timeout=0,
-                    type=MessageBox.TYPE_INFO, enable_input=True)
+                    MessageBox, _("Resuming playback"), timeout = 0,
+                    type = MessageBox.TYPE_INFO, enable_input = True)
             self.__timer.start(500, True)
 
     def __seekToPosition(self):
@@ -539,6 +551,7 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
     def doEofInternal(self, playing):
         self.close()
 
+
 class Meta(object):
     def __init__(self, meta):
         self.meta = meta
@@ -560,7 +573,7 @@ class Meta(object):
                 except:
                     season = -1
                 if season > 0 and episode > 0:
-                    title += " S%02dE%02d"%(season, episode)
+                    title += " S%02dE%02d" % (season, episode)
                 episodeTitle = vTag.get("title")
                 if episodeTitle:
                     title += " - " + episodeTitle
@@ -568,26 +581,25 @@ class Meta(object):
                 title = vTag.get("title") or vTag.get("originaltitle")
                 year = vTag.get("year")
                 if year and title:
-                    title+= " (" + str(year) + ")"
+                    title += " (" + str(year) + ")"
         if not title:
             title = self.meta.get("title")
         filename = self.getFilename()
         if not title and fileExists(str(filename) + ".spztxt"):
-            f=open(str(filename) + ".spztxt", "r")
-            tok=0
+            f = open(str(filename) + ".spztxt", "r")
+            tok = 0
             for line in f.readlines():
-                idx=line.find("->")
+                idx = line.find("->")
                 if idx != -1:
-                    if tok==0:
-                        title=''+line[idx+3:]
+                    if tok == 0:
+                        title = "" + line[idx + 3:]
                         break
             f.close()
         if not title:
             listItem = self.meta.get("listItem")
             if listItem:
                 title = listItem.get("label")
-
-        return title #title.replace(r'(?s){re.escape("[")}.*?re.escape("]")}','', regex=True)
+        return title  # title.replace(r'(?s){re.escape("[")}.*?re.escape("]")}','', regex=True)
 
     def getStartTime(self):
         startTime = 0
@@ -630,15 +642,15 @@ class Meta(object):
 
         filename = self.getFilename()
         if not plot and fileExists(str(filename) + ".spztxt"):
-            f=open(str(filename) + ".spztxt", "r")
-            tok=0
+            f = open(str(filename) + ".spztxt", "r")
+            tok = 0
             for line in f.readlines():
-                idx=line.find("->")
+                idx = line.find("->")
                 if idx != -1:
-                    if tok==0:
-                        tok=1
-                    elif tok==1:
-                        plot=u''+line[idx+3:]
+                    if tok == 0:
+                        tok = 1
+                    elif tok == 1:
+                        plot = "" + line[idx + 3:]
                         break
             f.close()
 
@@ -652,15 +664,17 @@ class Meta(object):
 
         filename = self.getFilename()
         if not genre and fileExists(str(filename) + ".spztxt"):
-            f=open(str(filename) + ".spztxt", "r")
+            f = open(str(filename) + ".spztxt", "r")
             for line in f.readlines():
-                if line.split(":")[0]=='Género':
-                    genrestr=u''+line.split(":")[1][1:]
+                if line.split(":")[0] == 'Género':
+                    genrestr = "" + line.split(":")[1][1:]
                     genre = genrestr.split(" | ")
                     break
             f.close()
 
         return genre
+
+
 
 class VideoInfoView(Screen):
     if esHD():
@@ -675,7 +689,7 @@ class VideoInfoView(Screen):
            <widget source="description" position="330,150" size="800,400" font="RegularHD; 20" render="RunningTextSpa" options="movetype=swimming,startpoint=0,direction=top,steptime=100,repeat=0,always=0,oneshot=0,startdelay=15000,pause=500,backtime=5" noWrap="0"/>
         </screen>"""
     else:
-        skin="""
+        skin = """
         <screen position="center,center" size="766,400" title="View Video Info" >
            <widget name="image" position="10,100" size="200,266" alphatest="on" transparent="1"/>
            <widget source="session.CurrentService" render="Label" position="13,13" size="740,28" zPosition="1"  font="Regular;26" verticalAlignment="center" horizontalAlignment="left" foregroundColor="#00ffa533" transparent="1">
@@ -691,7 +705,7 @@ class VideoInfoView(Screen):
         Screen.__init__(self, session)
 
         self["genre"] = Label()
-        self["description"]=Label()
+        self["description"] = Label()
         # load meta info from json file provided by Kodi Enigma2Player
         try:
             meta = json.load(open(KODIEXTIN, "r"))
@@ -794,7 +808,7 @@ class E2KodiExtServer(UDSServer):
         RCUnlock()
 
         setaudio.switch(False, True)
-        if brand not in ('vuplus', 'formuler'):
+        if BRAND not in ("Vu+", "formuler"):
             setresolution.switch(False, True)
         # parse subtitles, play path and service type from data
         sType = 4097
@@ -854,14 +868,14 @@ class E2KodiExtServer(UDSServer):
         sref.setName(six.ensure_str(title))
 
         # set start position if provided
-        #self.kodiPlayer.setStartPosition(Meta(meta).getStartTime())
+        # self.kodiPlayer.setStartPosition(Meta(meta).getStartTime())
 
         self.kodiPlayer.playService(sref)
         self.messageIn.put((True, None))
 
     def kodiPlayerExitCB(self, callback=None):
         setaudio.switch(True, True)
-        if brand not in ('vuplus', 'formuler'):
+        if BRAND not in ("Vu+", "Formuler"):
             setresolution.switch(True, True)
         SESSION.nav.stopService()
         self.kodiPlayer = None
@@ -869,6 +883,7 @@ class E2KodiExtServer(UDSServer):
 
     def infoview(self):
         SESSION.open(VideoInfoView)
+
 
 class KodiLauncher(Screen):
     if esHD():
@@ -902,7 +917,7 @@ class KodiLauncher(Screen):
                         kodiProc = p.split()
             if kodiProc is not None:
                 kodiPid = int(kodiProc[0])
-                print("[KodiLauncher] startup: kodi is running, pid = %d , resuming..."% kodiPid)
+                print("[KodiLauncher] startup: kodi is running, pid = %d , resuming..." % kodiPid)
                 self.resumeKodi(kodiPid)
             else:
                 print("[KodiLauncher] startup: kodi is not running, starting...")
@@ -927,9 +942,9 @@ class KodiLauncher(Screen):
             self.session.nav.playService(self.previousService)
         try:
             if os.path.exists('/media/hdd/.kodi/'):
-                Console().ePopen('rm -rf /media/hdd/kodi_crashlog*.log')
+                Console().ePopen("rm -rf /media/hdd/kodi_crashlog*.log")
             else:
-                Console().ePopen('rm -rf /tmp/kodi/kodi_crashlog*.log')
+                Console().ePopen("rm -rf /tmp/kodi/kodi_crashlog*.log")
         except:
             pass
         self.close()
