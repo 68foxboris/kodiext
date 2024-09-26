@@ -80,10 +80,20 @@ class SetAudio:
         self.dts = "downmix"
         self.aac = "passthrough"
         self.aacplus = "passthrough"
+        self.atimer = eTimer()
+        self.atimer.callback.append(self.run)
+        self.Tokodi=False
+        self.Player=False
 
-    def switch(self, Tokodi=False, Player=False):
-        if Tokodi:
-            if Player:
+    def switch(self,Tokodi=False, Player=False):
+        self.Tokodi=Tokodi
+        self.Player=Player
+        self.atimer.start(500, True)
+
+    def run(self):
+        self.atimer.stop()
+        if self.Tokodi:
+            if self.Player:
                 self.VolPlayer = self.volctrl.getVolume()
             vol = 100
             ac3 = "downmix"
@@ -91,7 +101,7 @@ class SetAudio:
             aac = "passthrough"
             aacplus = "passthrough"
         else:
-            if Player:
+            if self.Player:
                 vol = self.VolPlayer
             else:
                 vol = self.VolPrev
@@ -161,6 +171,10 @@ class SetResolution:
         self.kodirate = "50Hz"
         self.port = config.av.videoport.value
         self.rate = None
+        self.atimer = eTimer()
+        self.atimer.callback.append(self.run)
+        self.Tokodi=False
+        self.Player=False
         if BRAND in ("Vu+", "Formuler"):
             resolutions = ("720i", "720p")
         else:
@@ -176,7 +190,13 @@ class SetResolution:
                         pass
 
     def switch(self, Tokodi=False, Player=False):
-        if Tokodi:
+        self.Tokodi=Tokodi
+        self.Player=Player
+        self.atimer.start(500, True)
+
+    def run(self):
+        self.atimer.stop()
+        if self.Tokodi:
             if self.kodires and self.kodirate and self.port:
                 video_hw.setMode(self.port, self.kodires, self.kodirate)
                 open("/proc/stb/video/videomode", "w").write(self.kodires + self.kodirate.replace("Hz", ""))
@@ -745,6 +765,10 @@ class E2KodiExtServer(UDSServer):
         self.messageOut = Queue()
         self.messagePump = ePythonMessagePump()
         self.messagePump.recv_msg.get().append(self.messageReceived)
+        self.startTimer = eTimer()
+        self.startTimer.timeout.get().append(self.player)
+        self.endTimer = eTimer()
+        self.endTimer.timeout.get().append(self.end)
 
     def shutdown(self):
         self.messagePump.stop()
@@ -810,10 +834,16 @@ class E2KodiExtServer(UDSServer):
         setaudio.switch(False, True)
         if BRAND not in ("Vu+", "Formuler"):
             setresolution.switch(False, True)
+        self.status = status
+        self.data = data
+        self.startTimer.start(600, True)
+
+    def player(self):
+        self.startTimer.stop()
         # parse subtitles, play path and service type from data
         sType = 4097
         subtitles = []
-        data = six.ensure_str(data)
+        data = six.ensure_str(self.data)
         dataSplit = data.strip().split("\n")
         if len(dataSplit) == 1:
             playPath = dataSplit[0]
@@ -848,7 +878,7 @@ class E2KodiExtServer(UDSServer):
                 meta = {}
 
         # create Kodi player Screen
-        noneFnc = lambda: None
+        noneFnc = lambda:None
         self.kodiPlayer = SESSION.openWithCallback(self.kodiPlayerExitCB, KodiVideoPlayer,
             noneFnc, noneFnc, noneFnc, self.infoview, noneFnc)
 
@@ -875,9 +905,13 @@ class E2KodiExtServer(UDSServer):
 
     def kodiPlayerExitCB(self, callback=None):
         setaudio.switch(True, True)
+        self.endTimer.start(600, True)
+
+    def end(self):
+        self.endTimer.stop()
+        SESSION.nav.stopService()
         if BRAND not in ("Vu+", "Formuler"):
             setresolution.switch(True, True)
-        SESSION.nav.stopService()
         self.kodiPlayer = None
         self.subtitles = []
 
@@ -899,7 +933,11 @@ class KodiLauncher(Screen):
         self.startupTimer = eTimer()
         self.startupTimer.timeout.get().append(self.startup)
         self.startupTimer.start(500, True)
-        self.onClose.append(RCUnlock)
+        self.endTimer = eTimer()
+        self.endTimer.timeout.get().append(self.end)
+        self.endTimer1 = eTimer()
+        self.endTimer1.timeout.get().append(self.end1)
+#        self.onClose.append(RCUnlock)
 
     def startup(self):
         def psCallback(data, retval, extraArgs):
@@ -923,6 +961,8 @@ class KodiLauncher(Screen):
                 print("[KodiLauncher] startup: kodi is not running, starting...")
                 self.startKodi()
 
+        setaudio.switch(True)
+        setresolution.switch(True)
         self._checkConsole = Console()
         self._checkConsole.ePopen("ps | grep kodi.bin | grep -v grep", psCallback)
 
@@ -936,8 +976,17 @@ class KodiLauncher(Screen):
 
     def stop(self):
         FBUnlock()
+        RCUnlock()
         setaudio.switch()
+        self.endTimer1.start(600, True)
+
+    def end1(self):
+        self.endTimer1.stop()
         setresolution.switch()
+        self.endTimer.start(600, True)
+
+    def end(self):
+        self.endTimer.stop()
         if self.previousService:
             self.session.nav.playService(self.previousService)
         try:
@@ -967,7 +1016,6 @@ def autoStart(reason, **kwargs):
 
 def startLauncher(session, **kwargs):
     setaudio.ReadData()
-    setaudio.switch(True)
     setresolution.ReadData()
     RCUnlock()
     global SESSION
