@@ -281,33 +281,37 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
     if esHD():
         skin = """
         <screen title="custom service source" position="0, 0" size="1921,1081" zPosition="1" flags="wfNoBorder" backgroundColor="transparent">
-            <widget source="global.CurrentTime" render="Label" position="1700,34" size="150,67" font="RegularHD; 32" backgroundColor="#10000000" transparent="1" zPosition="3" horizontalAlignment="center">
+            <widget source="global.CurrentTime" render="Label" position="1700,34" size="150,67" font="RegularHD; 32" backgroundColor="#10000000" transparent="1" zPosition="3" halign="center">
               <convert type="ClockToText">Default</convert>
             </widget>
-            <eLabel name="" position="0,15" size="1924,125" zPosition="-10"/>
+            <widget name="endsat" position="1447,85" size="300,37" zPosition="6" font="RegularHD;22" halign="right"/>
+            <widget source="session.CurrentService" render="Label" position="1751,85" size="150,37" zPosition="6" font="RegularHD;22" halign="left" transparent="1">
+                <convert type="ServicePosition">EndTime,ShowNoSeconds</convert>
+            </widget>
+            <eLabel name="" position="0,0" size="1924,140" zPosition="-10"/>
             <eLabel position="0,856" zPosition="-11" size="1921,224" />
             <widget name="image" position="30,780" size="300,300" alphatest="on" transparent="1"/>
-            <widget source="session.CurrentService" render="Label" position="65,44" size="1845,38" zPosition="1"  font="RegularHD;24" verticalAlignment="center" horizontalAlignment="left" foregroundColor="#00ffa533" transparent="1">
+            <widget source="session.CurrentService" render="Label" position="65,44" size="1845,38" zPosition="1"  font="RegularHD;24" valign="center" halign="left" foregroundColor="#00ffa533" transparent="1">
               <convert type="ServiceName">Name</convert>
             </widget>
-            <widget name="genre" position="65,86" size="1845,35" zPosition="2" font="RegularHD;19" verticalAlignment="center" horizontalAlignment="left"/>
+            <widget name="genre" position="65,86" size="1845,35" zPosition="2" font="RegularHD;19" valign="center" halign="left"/>
             <eLabel name="progressbar-back" position="343,900" size="1500,4" backgroundColor="#00cccccc" />
             <widget source="session.CurrentService" render="Progress" foregroundColor="#00007eff" backgroundColor="#00ffffff" position="343,897" size="1500,10" zPosition="7" transparent="0">
                 <convert type="ServicePosition">Position</convert>
             </widget>
-            <widget source="session.CurrentService" render="Label" position="750,935" size="180,67" zPosition="6" font="RegularHD;32" horizontalAlignment="left"   transparent="1">
+            <widget source="session.CurrentService" render="Label" position="750,935" size="180,67" zPosition="6" font="RegularHD;32" halign="left"   transparent="1">
                 <convert type="ServicePosition">Position,ShowHours</convert>
             </widget>
             <eLabel name="" text="/" position="927,935" size="20,67" zPosition="6" font="RegularHD;32"/>
-            <widget source="session.CurrentService" render="Label" position="952,935" size="180,67" zPosition="6" font="RegularHD;32" horizontalAlignment="left"   transparent="1">
+            <widget source="session.CurrentService" render="Label" position="952,935" size="180,67" zPosition="6" font="RegularHD;32" halign="left"   transparent="1">
                 <convert type="ServicePosition">Length,ShowHours</convert>
             </widget>
             <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/audio.png" position="1343,942" size="40,40" scale="1" alphaTest="blend" />
                 <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/subtitle.png" position="1343,1007" size="40,40" scale="1" alphaTest="blend" />
                 <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/info.png" position="740,1020" size="40,40" scale="1" alphaTest="blend" />
                 <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/timeslip.png" position="925,1020" size="40,40" scale="1" alphaTest="blend" />
-        <eLabel name="" position="1130,940" size="200,45" transparent="1" text="Audio" horizontalAlignment="right" font="RegularHD; 20" />
-        <eLabel name="" position="1130,1005" size="200,45" transparent="1" text="Subtitle" horizontalAlignment="right" font="RegularHD; 20" />
+        <eLabel name="" position="1130,940" size="200,45" transparent="1" text="Audio" halign="right" font="RegularHD; 20" />
+        <eLabel name="" position="1130,1005" size="200,45" transparent="1" text="Subtitle" halign="right" font="RegularHD; 20" />
         <eLabel name="" position="790,1022" size="270,45" transparent="1" text="Info" font="RegularHD; 20" />
         <eLabel name="" position="975,1022" size="233,45" transparent="1" text="TimeSleep" font="RegularHD; 20" />
         <widget source="session.CurrentService" render="Label" position="1400,940" size="445,45" font="RegularHD; 20" backgroundColor="#001A1A1A">
@@ -316,11 +320,11 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
         <widget source="session.CurrentService" render="Label" position="1400,1005" size="445,45" font="RegularHD; 20" backgroundColor="#001E1C1C">
                 <convert type="TrackInfo">Subtitle</convert>
         </widget>
-        <widget source="session.CurrentService" render="Label" position="345,1013" size="90,30" font="RegularHD; 16" horizontalAlignment="right" verticalAlignment="center" transparent="1">
+        <widget source="session.CurrentService" render="Label" position="345,1013" size="90,30" font="RegularHD; 16" halign="right" valign="center" transparent="1">
                 <convert type="ServiceInfo">VideoWidth</convert>
         </widget>
-        <eLabel text="x" position="435,1013" size="24,30" font="RegularHD; 16" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
-        <widget source="session.CurrentService" render="Label" position="462,1013" size="90,30" font="RegularHD; 16" horizontalAlignment="left" verticalAlignment="center" transparent="1">
+        <eLabel text="x" position="435,1013" size="24,30" font="RegularHD; 16" halign="center" valign="center" transparent="1" />
+        <widget source="session.CurrentService" render="Label" position="462,1013" size="90,30" font="RegularHD; 16" halign="left" valign="center" transparent="1">
                 <convert type="ServiceInfo">VideoHeight</convert>
         </widget>
         <widget pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/sd-ico.png" position="400,952" render="Pixmap" size="80,60" source="session.CurrentService" zPosition="60" alphaTest="blend" scale="1">
@@ -342,33 +346,37 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
     else:
         skin = """
         <screen title="custom service source" position="0, 0" size="1280,720" zPosition="1" flags="wfNoBorder" backgroundColor="transparent">
-            <widget source="global.CurrentTime" render="Label" position="1133,22" size="100,44" font="Regular; 32" backgroundColor="#10000000" transparent="1" zPosition="3" horizontalAlignment="center">
+            <widget source="global.CurrentTime" render="Label" position="1133,22" size="100,44" font="Regular; 32" backgroundColor="#10000000" transparent="1" zPosition="3" halign="center">
               <convert type="ClockToText">Default</convert>
             </widget>
-            <eLabel name="" position="0,10" size="1282,83" zPosition="-10"/>
+            <widget name="endsat" position="964,56" size="200,24" zPosition="6" font="Regular;22" halign="right"/>
+            <widget source="session.CurrentService" render="Label" position="1167,56" size="100,24" zPosition="6" font="Regular;22" halign="left" transparent="1">
+                <convert type="ServicePosition">EndTime,ShowNoSeconds</convert>
+            </widget>
+            <eLabel name="" position="0,0" size="1282,93" zPosition="-10"/>
             <eLabel position="0,570" zPosition="-11" size="1280,149" />
             <widget name="image" position="20,520" size="200,200" alphatest="on" transparent="1"/>
-            <widget source="session.CurrentService" render="Label" position="43,29" size="1230,25" zPosition="1"  font="Regular;24" verticalAlignment="center" horizontalAlignment="left" foregroundColor="#00ffa533" transparent="1">
+            <widget source="session.CurrentService" render="Label" position="43,29" size="1230,25" zPosition="1"  font="Regular;24" valign="center" halign="left" foregroundColor="#00ffa533" transparent="1">
               <convert type="ServiceName">Name</convert>
             </widget>
-            <widget name="genre" position="43,57" size="1230,23" zPosition="2" font="Regular;19" verticalAlignment="center" horizontalAlignment="left"/>
+            <widget name="genre" position="43,57" size="1230,23" zPosition="2" font="Regular;19" valign="center" halign="left"/>
             <eLabel name="progressbar-back" position="228,600" size="1000,2" backgroundColor="#00cccccc" />
             <widget source="session.CurrentService" render="Progress" foregroundColor="#00007eff" backgroundColor="#00ffffff" position="228,598" size="1000,6" zPosition="7" transparent="0">
                 <convert type="ServicePosition">Position</convert>
             </widget>
-            <widget source="session.CurrentService" render="Label" position="500,623" size="120,44" zPosition="6" font="Regular;32" horizontalAlignment="left"   transparent="1">
+            <widget source="session.CurrentService" render="Label" position="500,623" size="120,44" zPosition="6" font="Regular;32" halign="left"   transparent="1">
                 <convert type="ServicePosition">Position,ShowHours</convert>
             </widget>
             <eLabel name="" text="/" position="618,623" size="13,44" zPosition="6" font="Regular;32"/>
-            <widget source="session.CurrentService" render="Label" position="634,623" size="120,44" zPosition="6" font="Regular;32" horizontalAlignment="left"   transparent="1">
+            <widget source="session.CurrentService" render="Label" position="634,623" size="120,44" zPosition="6" font="Regular;32" halign="left"   transparent="1">
                 <convert type="ServicePosition">Length,ShowHours</convert>
             </widget>
             <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/audio.png" position="895,628" size="27,27" scale="1" alphaTest="blend" />
                 <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/subtitle.png" position="895,671" size="27,27" scale="1" alphaTest="blend" />
                 <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/info.png" position="493,680" size="27,27" scale="1" alphaTest="blend" />
                 <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/timeslip.png" position="617,680" size="27,27" scale="1" alphaTest="blend" />
-        <eLabel name="" position="753,627" size="133,30" transparent="1" text="Audio" horizontalAlignment="right" font="Regular; 20" />
-        <eLabel name="" position="753,670" size="133,30" transparent="1" text="Subtitle" horizontalAlignment="right" font="Regular; 20" />
+        <eLabel name="" position="753,627" size="133,30" transparent="1" text="Audio" halign="right" font="Regular; 20" />
+        <eLabel name="" position="753,670" size="133,30" transparent="1" text="Subtitle" halign="right" font="Regular; 20" />
         <eLabel name="" position="527,681" size="180,30" transparent="1" text="Info" font="Regular; 20" />
         <eLabel name="" position="650,681" size="155,30" transparent="1" text="TimeSleep" font="Regular; 20" />
         <widget source="session.CurrentService" render="Label" position="933,627" size="297,30" font="Regular; 20" backgroundColor="#001A1A1A">
@@ -377,11 +385,11 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
         <widget source="session.CurrentService" render="Label" position="933,670" size="297,30" font="Regular; 20" backgroundColor="#001E1C1C">
                 <convert type="TrackInfo">Subtitle</convert>
         </widget>
-        <widget source="session.CurrentService" render="Label" position="230,675" size="60,20" font="Regular; 16" horizontalAlignment="right" verticalAlignment="center" transparent="1">
+        <widget source="session.CurrentService" render="Label" position="230,675" size="60,20" font="Regular; 16" halign="right" valign="center" transparent="1">
                 <convert type="ServiceInfo">VideoWidth</convert>
         </widget>
-        <eLabel text="x" position="290,675" size="16,20" font="Regular; 16" horizontalAlignment="center" verticalAlignment="center" transparent="1" />
-        <widget source="session.CurrentService" render="Label" position="310,675" size="60,20" font="Regular; 16" horizontalAlignment="left" verticalAlignment="center" transparent="1">
+        <eLabel text="x" position="290,675" size="16,20" font="Regular; 16" halign="center" valign="center" transparent="1" />
+        <widget source="session.CurrentService" render="Label" position="310,675" size="60,20" font="Regular; 16" halign="left" valign="center" transparent="1">
                 <convert type="ServiceInfo">VideoHeight</convert>
         </widget>
         <widget pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Kodi/image/sd-ico.png" position="267,635" render="Pixmap" size="53,40" source="session.CurrentService" zPosition="60" alphaTest="blend" scale="1">
@@ -435,6 +443,7 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
         self.__position = None
         self.__firstStart = True
         self["genre"] = Label()
+        self["endsat"]= Label(_("Ends at"))
 
         # load meta info from json file provided by Kodi Enigma2Player
         try:
@@ -701,10 +710,10 @@ class VideoInfoView(Screen):
         skin = """
         <screen position="center,center" size="1150,600" title="View Video Info" >
            <widget name="image" position="15,150" size="300,400" alphaTest="on" transparent="1"/>
-           <widget source="session.CurrentService" render="Label" position="20,20" size="1110,42" zPosition="1"  font="RegularHD;26" verticalAlignment="center" horizontalAlignment="left" foregroundColor="#00ffa533" transparent="1">
+           <widget source="session.CurrentService" render="Label" position="20,20" size="1110,42" zPosition="1"  font="RegularHD;26" valign="center" halign="left" foregroundColor="#00ffa533" transparent="1">
                <convert type="ServiceName">Name</convert>
            </widget>
-           <widget name="genre" position="20,70" size="1110,35" zPosition="2" font="RegularHD;19" verticalAlignment="center" horizontalAlignment="left"/>
+           <widget name="genre" position="20,70" size="1110,35" zPosition="2" font="RegularHD;19" valign="center" halign="left"/>
            <eLabel name="linea" position="20,110" size="1110,2" foregroundColor="#40444444" transparent="0" zPosition="20" backgroundColor="#30555555"/>
            <widget source="description" position="330,150" size="800,400" font="RegularHD; 20" render="RunningTextSpa" options="movetype=swimming,startpoint=0,direction=top,steptime=100,repeat=0,always=0,oneshot=0,startdelay=15000,pause=500,backtime=5" noWrap="0"/>
         </screen>"""
@@ -712,10 +721,10 @@ class VideoInfoView(Screen):
         skin = """
         <screen position="center,center" size="766,400" title="View Video Info" >
            <widget name="image" position="10,100" size="200,266" alphatest="on" transparent="1"/>
-           <widget source="session.CurrentService" render="Label" position="13,13" size="740,28" zPosition="1"  font="Regular;26" verticalAlignment="center" horizontalAlignment="left" foregroundColor="#00ffa533" transparent="1">
+           <widget source="session.CurrentService" render="Label" position="13,13" size="740,28" zPosition="1"  font="Regular;26" valign="center" halign="left" foregroundColor="#00ffa533" transparent="1">
                <convert type="ServiceName">Name</convert>
            </widget>
-           <widget name="genre" position="13,46" size="740,23" zPosition="2" font="Regular;19" verticalAlignment="center" horizontalAlignment="left"/>
+           <widget name="genre" position="13,46" size="740,23" zPosition="2" font="Regular;19" valign="center" halign="left"/>
            <eLabel name="linea" position="13,73" size="740,1" foregroundColor="#40444444" transparent="0" zPosition="20" backgroundColor="#30555555"/>
            <widget source="description" position="220,100" size="533,266" font="Regular; 20" render="RunningTextSpa" options="movetype=swimming,startpoint=0,direction=top,steptime=100,repeat=0,always=0,oneshot=0,startdelay=15000,pause=500,backtime=5" noWrap="0"/>
         </screen>"""
@@ -836,7 +845,7 @@ class E2KodiExtServer(UDSServer):
             setresolution.switch(False, True)
         self.status = status
         self.data = data
-        self.startTimer.start(600, True)
+        self.startTimer.start(1000, True)
 
     def player(self):
         self.startTimer.stop()
@@ -932,7 +941,7 @@ class KodiLauncher(Screen):
         self.session.nav.stopService()
         self.startupTimer = eTimer()
         self.startupTimer.timeout.get().append(self.startup)
-        self.startupTimer.start(500, True)
+        self.startupTimer.start(1000, True)
         self.endTimer = eTimer()
         self.endTimer.timeout.get().append(self.end)
         self.endTimer1 = eTimer()
@@ -955,7 +964,7 @@ class KodiLauncher(Screen):
                         kodiProc = p.split()
             if kodiProc is not None:
                 kodiPid = int(kodiProc[0])
-                print("[KodiLauncher] startup: kodi is running, pid = %d , resuming..." % kodiPid)
+                print("[KodiLauncher] startup: kodi is running, pid = %d , resuming..."% kodiPid)
                 self.resumeKodi(kodiPid)
             else:
                 print("[KodiLauncher] startup: kodi is not running, starting...")
@@ -978,12 +987,12 @@ class KodiLauncher(Screen):
         FBUnlock()
         RCUnlock()
         setaudio.switch()
-        self.endTimer1.start(600, True)
+        self.endTimer1.start(1000, True)
 
     def end1(self):
         self.endTimer1.stop()
         setresolution.switch()
-        self.endTimer.start(600, True)
+        self.endTimer.start(1000, True)
 
     def end(self):
         self.endTimer.stop()
