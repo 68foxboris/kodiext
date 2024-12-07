@@ -17,7 +17,7 @@ from Components.ServiceEventTracker import ServiceEventTracker
 from Components.Pixmap import Pixmap
 from Screens.HelpMenu import HelpableScreen
 from Screens.InfoBarGenerics import InfoBarNotifications, InfoBarSeek, \
-    InfoBarAudioSelection, InfoBarShowHide, InfoBarSubtitleSupport
+    InfoBarAudioSelection, InfoBarShowHide, InfoBarSubtitleSupport, InfoBarMoviePlayerSummary
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import fileExists, isPluginInstalled
@@ -444,6 +444,7 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
         self.__firstStart = True
         self["genre"] = Label()
         self["endsat"]= Label(_("Ends at"))
+        self.onChangedEntry = []
 
         # load meta info from json file provided by Kodi Enigma2Player
         try:
@@ -516,6 +517,9 @@ class KodiVideoPlayer(InfoBarBase, InfoBarShowHide, SubsSupportStatus, SubsSuppo
         self.onClose.append(boundFunction(self.session.deleteDialog, self.statusScreen))
         self.onClose.append(boundFunction(Notifications.RemovePopup, self.RESUME_POPUP_ID))
         self.onClose.append(self.__timer.stop)
+
+    def createSummary(self):
+        return InfoBarMoviePlayerSummary
 
     def keyr(self):
         try:
@@ -927,6 +931,22 @@ class E2KodiExtServer(UDSServer):
     def infoview(self):
         SESSION.open(VideoInfoView)
 
+class KodiLauncherSummary(Screen):
+    skin = """
+    <screen position="fill">
+         <widget name="kodi" position="fill" alphatest="blend" />
+    </screen>"""
+
+    def __init__(self, session, parent):
+        Screen.__init__(self, session, parent=parent)
+        logo = None
+        if fileExists("/usr/share/kodi/media/vendor_logo.png"):
+            logo = "/usr/share/kodi/media/vendor_logo.png"
+        elif fileExists("/usr/share/kodi/media/splash.jpg"):
+            logo = "/usr/share/kodi/media/splash.jpg"
+        if logo:
+            self["kodi"] = WebPixmap(logo, caching=True)
+
 
 class KodiLauncher(Screen):
     if esHD():
@@ -947,6 +967,9 @@ class KodiLauncher(Screen):
         self.endTimer1 = eTimer()
         self.endTimer1.timeout.get().append(self.end1)
 #        self.onClose.append(RCUnlock)
+
+    def createSummary(self):
+        return KodiLauncherSummary
 
     def startup(self):
         def psCallback(data, retval, extraArgs):
