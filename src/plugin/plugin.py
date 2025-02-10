@@ -8,7 +8,7 @@ from enigma import eTimer, fbClass, eRCInput, getDesktop, eDVBVolumecontrol
 
 from Components.ActionMap import ActionMap
 from Components.Label import Label
-from Components.AVSwitch import avSwitch
+from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
 from Components.config import config, ConfigSubsection, ConfigYesNo
 from Components.ActionMap import HelpableActionMap
 from Components.Console import Console
@@ -160,7 +160,7 @@ class SetResolution:
             for res in resolutions:
                 for rate in rates:
                     try:
-                        if avSwitch.isModeAvailable(self.port, res, rate):
+                        if video_hw.isModeAvailable(self.port, res, rate):
                             self.kodires = res
                             self.kodirate = rate
                     except Exception:
@@ -169,11 +169,11 @@ class SetResolution:
     def switch(self, Tokodi=False, Player=False):
         if Tokodi:
             if self.kodires and self.kodirate and self.port:
-                avSwitch.setMode(self.port, self.kodires, self.kodirate)
+                video_hw.setMode(self.port, self.kodires, self.kodirate)
                 open("/proc/stb/video/videomode", "w").write(self.kodires + self.kodirate.replace("Hz", ""))
         else:
             if self.E2res and self.rate and self.port:
-                avSwitch.setMode(self.port, self.E2res, self.rate)
+                video_hw.setMode(self.port, self.E2res, self.rate)
 
     def ReadData(self):
         self.E2res = config.av.videomode[self.port].value
